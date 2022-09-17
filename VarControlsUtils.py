@@ -21,16 +21,6 @@ def remove_repetidos(lista):
 
 #---------------------------------------------------------------------------------------------
 
-def sciStr(floatOrInt, precision = 5, exp_digit = 3, min_digits = 5):
-    return str(np.format_float_scientific(float(floatOrInt), precision=precision, exp_digits=exp_digit, min_digits=min_digits))
-
-#---------------------------------------------------------------------------------------------
-
-def round(floatOrInt, precision = 5):
-    return round(float(floatOrInt), precision)
-
-#---------------------------------------------------------------------------------------------
-
 def removeEspecialCaracters(inText):
 
     outText = inText.replace("|","").replace("/","").replace("\\","").replace("*","").\
