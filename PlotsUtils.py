@@ -1,8 +1,10 @@
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as path_effects
 import numpy as np
+import pandas as pd
+import seaborn as sns
 
-class MasterPlot():
+class graficPlot():
     #Faltando: circulo e retangulo
 
     def __init__(self, X1 = [], Y1 = [], X2 = [], Y2 = [], X3 = [], Y3 = [], texts1 = [], texts2 = [], texts3 = [], \
@@ -12,9 +14,9 @@ class MasterPlot():
         colorgrondText1 = "Yellow", colorgrondText2 = "Yellow", colorgrondText3 = "Yellow", \
         xLim = None, y1Lim = None, y2Lim = None, y3Lim = None, legendLoc1 = "upper left", legendLoc2 = "upper right", legendLoc3 = "lower right", \
         xscale = "linear", y1Scale = "linear", y2Scale = "linear", y3Scale = "linear", \
-        sizeText = None, grid = True, textEffect = True, title = "", degrad = True, colorList = False, \
-        circle = True, circlePos = [], circleColor = "black", circleFill = None, circleTrans = 0.75, circlePlot = 1, \
-        rect = True, rectPos = [], rectColor = "black", rectFill = None, rectTrans = 0.75, rectPlot = 1, \
+        sizeText = 10, grid = True, textEffect = True, title = "", degrad = True, colorList = False, \
+        circle = False, circlePos = [], circleColor = "black", circleFill = None, circleTrans = 0.75, circlePlot = 1, \
+        rect = False, rectPos = [], rectColor = "black", rectFill = None, rectTrans = 0.75, rectPlot = 1, \
         addLogo = False, pathLogo = "", backgroundImg = False, pathImg = ""):
         
         self.X1 = X1                    #Plots primeiro eixo
@@ -228,6 +230,7 @@ class MasterPlot():
                 self.graphicHost.plot(nX, nY, marker, lw = self.linewidth1, label=legend, color = colorDef, alpha = colorTransp)
 
             self.graphicHost.legend(loc=self.legendLoc1)
+            if (len(self.legendText1) == 0): self.graphicHost.get_legend().remove()
             self.graphicHost.yaxis.label.set_color(colorDef)
             self.graphicHost.set(xlim = self.xLim, ylim = self.y1Lim, xlabel = self.xlabel, ylabel = self.ylabel1, title = self.title)
             
@@ -273,6 +276,7 @@ class MasterPlot():
 
                 self.graphicTwo.yaxis.label.set_color(colorDef)
                 self.graphicTwo.legend(loc=self.legendLoc2)
+                if (len(self.legendText2) == 0): self.graphicTwo.get_legend().remove()
                 self.graphicTwo.set_ylabel(self.ylabel2)
 
                 if (self.y2Lim != None): self.graphicTwo.set_ylim(self.y2Lim)
@@ -313,6 +317,7 @@ class MasterPlot():
 
                 self.graphicThree.yaxis.label.set_color(colorDef)
                 self.graphicThree.legend(loc=self.legendLoc3)
+                if (len(self.legendText3) == 0): self.graphicThree.get_legend().remove()
                 self.graphicThree.set_ylabel(self.ylabel3)
                 self.graphicThree.spines['right'].set_position(('outward', 60))
                 #self.graphicThree.xaxis.set_ticks([])
@@ -353,3 +358,56 @@ class MasterPlot():
     def addLegend (self, legend, marker, colorDef, colorTransp = 1.0):
         self.graphicHost.plot(0.0, 0.0, marker, lw = 0, label=legend, color = colorDef, alpha = colorTransp)
         self.graphicHost.legend(loc=self.legendLoc1)
+
+
+def histPlot (dataFrame, xLabel1, yLabel1= "", kind= "count"):
+
+    if (kind == "count"):
+        sns.catplot(x = xLabel1, data = dataFrame, 
+            kind=kind, 
+            aspect=2,
+            palette="GnBu_d",
+            order = dataFrame[xLabel1].value_counts().index)
+
+        if yLabel1 != "": 
+            plt.ylabel(yLabel1)
+
+        plt.show()
+
+if (__name__ == "__main__"):    
+
+    teste_graficPlot = False
+    teste_histPlot = False
+
+    if (teste_graficPlot):
+
+        valoresX1= [[1,2,3],[2,3,4]]
+        valoresY1= [[2,3,4],[3,4,5]]
+        valoresX2= [[3,7,9],[2,3,4]]
+        valoresY2= [[4,7,10],[3,4,5]]
+        valoresX3= [[5,7,12],[2,3,4]]
+        valoresY3= [[6,7,13],[3,4,5]]
+
+        texts1 = [[1,2,"valor1"], [2,3,"valor2"]]
+
+        grafico = graficPlot(X1 = valoresX1, Y1 = valoresY1, X2 = valoresX2, Y2 = valoresY2, X3 = valoresX3, Y3 = valoresY3, texts1 = texts1, texts2 = [], texts3 = [], 
+        linewidth1 = 2, linewidth2 = 2, linewidth3 = 2, colorLine1 = "red", colorLine2 = "green", colorLine3 = "blue", 
+        marker1 = ["o", "^"], marker2 = [], marker3 = [], xlabel = "testeLabelX", ylabel1 = "testeLabel1", ylabel2 = "", ylabel3 = "", 
+        legendText1 = ["valores1", "valores2"], legendText2 = [], legendText3 = [], colorText1 = "red", colorText2 = "blue", colorText3 = "green", 
+        colorgrondText1 = "Yellow", colorgrondText2 = "Yellow", colorgrondText3 = "Yellow", 
+        xLim = [1,10], y1Lim = [2,9], y2Lim = None, y3Lim = None, legendLoc1 = "upper left", legendLoc2 = "upper right", legendLoc3 = "lower right", 
+        xscale = "linear", y1Scale = "linear", y2Scale = "linear", y3Scale = "linear", 
+        sizeText = 10, grid = True, textEffect = True, title = "", degrad = True, colorList = False, 
+        circle = False, circlePos = [], circleColor = "black", circleFill = None, circleTrans = 0.75, circlePlot = 1, 
+        rect = False, rectPos = [], rectColor = "black", rectFill = None, rectTrans = 0.75, rectPlot = 1, 
+        addLogo = False, pathLogo = "", backgroundImg = False, pathImg = "")
+
+        grafico.show()
+
+    if (teste_histPlot):
+
+        dataFrame = sns.load_dataset("exercise")
+        print (dataFrame)
+
+        histPlot(dataFrame, "time", "Ocorrencias", kind= "count")
+
