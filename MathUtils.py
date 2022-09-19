@@ -1,7 +1,9 @@
 from nltk import FreqDist as nltkFreqDist
 import numpy as np
+import pandas as pd
 
 #---------------------------------------------------------------------------------------------
+#ESTATISTICA LISTA OBJ
 
 def maxTurbo (lista, nreturns= 1, key="escalar", out= "itens"):
     
@@ -61,11 +63,19 @@ def maxTurbo (lista, nreturns= 1, key="escalar", out= "itens"):
             return listReturn[0], listReturn[1]
 
 #---------------------------------------------------------------------------------------------
+#ARREDONDANDO VALORES
 
 def round(floatOrInt, precision = 5):
     return round(float(floatOrInt), precision)
 
 #---------------------------------------------------------------------------------------------
+#PRINT VALORES 
 
 def sciStr(floatOrInt, precision = 5, exp_digit = 3, min_digits = 5):
     return str(np.format_float_scientific(float(floatOrInt), precision=precision, exp_digits=exp_digit, min_digits=min_digits))
+
+#---------------------------------------------------------------------------------------------
+
+if __name__ == "__main__":
+
+    pass
