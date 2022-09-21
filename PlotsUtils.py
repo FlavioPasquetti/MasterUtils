@@ -4,6 +4,9 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
+#---------------------------------------------------------------------------------------------
+#PLOT PADRAO, LINHAS E PONTOS 2D 
+
 class graficPlot():
     #Faltando: circulo e retangulo
 
@@ -359,25 +362,38 @@ class graficPlot():
         self.graphicHost.plot(0.0, 0.0, marker, lw = 0, label=legend, color = colorDef, alpha = colorTransp)
         self.graphicHost.legend(loc=self.legendLoc1)
 
+#---------------------------------------------------------------------------------------------
+#PLOT HISTOGRAMA
 
-def histPlot (dataFrame, xLabel1, yLabel1= "", kind= "count"):
+def histPlot (dataFrame, xLabel1, yLabel1= "", title= "", kind= "count", aspect= 2, palette= "GnBu_d", grid= False):
 
+    #palettes:
+    #kinds= 
+    
     if (kind == "count"):
         sns.catplot(x = xLabel1, data = dataFrame, 
             kind=kind, 
-            aspect=2,
-            palette="GnBu_d",
+            aspect=aspect,
+            palette=palette,
             order = dataFrame[xLabel1].value_counts().index)
+
+        if title != "":
+            plt.title(title)
+
+        plt.grid(grid)
 
         if yLabel1 != "": 
             plt.ylabel(yLabel1)
 
         plt.show()
 
+
+
+
 if (__name__ == "__main__"):    
 
     teste_graficPlot = False
-    teste_histPlot = False
+    teste_histPlot = True
 
     if (teste_graficPlot):
 
@@ -409,5 +425,5 @@ if (__name__ == "__main__"):
         dataFrame = sns.load_dataset("exercise")
         print (dataFrame)
 
-        histPlot(dataFrame, "time", "Ocorrencias", kind= "count")
+        histPlot(dataFrame, xLabel1= "time", yLabel1="Ocorrencias", title= "Teste Titulo", kind= "count", aspect= 3, palette= "GnBu_d", grid= True)
 

@@ -65,7 +65,7 @@ def maxTurbo (lista, nreturns= 1, key="escalar", out= "itens"):
 #---------------------------------------------------------------------------------------------
 #ARREDONDANDO VALORES
 
-def round(floatOrInt, precision = 5):
+def roundT(floatOrInt, precision = 5):
     return round(float(floatOrInt), precision)
 
 #---------------------------------------------------------------------------------------------
@@ -75,6 +75,16 @@ def sciStr(floatOrInt, precision = 5, exp_digit = 3, min_digits = 5):
     return str(np.format_float_scientific(float(floatOrInt), precision=precision, exp_digits=exp_digit, min_digits=min_digits))
 
 #---------------------------------------------------------------------------------------------
+#Numero de Classes - Regra de Sturges
+
+def sturges (nAmostra):
+
+    k= 1 + (10/3)*np.log10(nAmostra)
+
+    return k
+
+
+
 
 if __name__ == "__main__":
 

@@ -73,6 +73,12 @@ def estatisticaPandas (df, key, param0= None, param1= None, param2= None, param3
     #-----------------------------------------------------------
 
     #max
+    if (key== "max"):
+        #param0 = columnName
+        #param1 = numero de valores
+
+        return df[param0].nlargest(param1).values
+
 
     #-----------------------------------------------------------
 
@@ -200,3 +206,15 @@ if __name__ == "__main__":
         dfResult= estatisticaPandas (df, "segm", param0= "Renda", param1= classes, param2= labels)
         ordenarIndex(dfResult)
         print (dfResult)
+
+        df= pd.DataFrame( data= {"Fulanin": [8,10,4,8,6,10,8],
+                                 "Beltrano": [10, 2, 0.5, 1, 3, 9.5, 10],
+                                 "Sicrano": [7.5, 8, 7, 8, 8, 8.5, 7]},
+                          index= ["Matemática", "Portugues", "Ingles", "Geografia",
+                                  "Historia", "Fisica", "Quimica"])
+
+        df.rename_axis("Matérias", axis= "columns", inplace= True)
+
+        dfResult= estatisticaPandas (df, "max", param0= "Fulanin", param1= 2)
+        teste= print (dfResult)
+    

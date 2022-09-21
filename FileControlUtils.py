@@ -265,3 +265,4 @@ def messageBox (title, message, icon = 0x10, buttons = 0, styleWindow = 0x2000):
     #MB_TASKMODAL = 0x2000
 
     return ctypes.windll.user32.MessageBoxW(None, message, title, icon | buttons | styleWindow)
+
