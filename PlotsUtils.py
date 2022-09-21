@@ -1,8 +1,11 @@
+from tkinter import Y
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as path_effects
 import numpy as np
 import pandas as pd
-import seaborn as sns
+import seaborn as sns   
+import scipy
+
 
 #---------------------------------------------------------------------------------------------
 #PLOT PADRAO, LINHAS E PONTOS 2D 
@@ -365,27 +368,49 @@ class graficPlot():
 #---------------------------------------------------------------------------------------------
 #PLOT HISTOGRAMA
 
-def histPlot (dataFrame, xLabel1, yLabel1= "", title= "", kind= "count", aspect= 2, palette= "GnBu_d", grid= False):
+def histPlot (dataFrame, xValue, yValue= None, xName= "", yName= "", title= "", kind= "count", aspect= None, palette= "GnBu_d", grid= False, bins= None):
 
     #palettes:
-    #kinds= 
+    #kinds= count, cumulative
     
     if (kind == "count"):
-        sns.catplot(x = xLabel1, data = dataFrame, 
+        sns.catplot(x = xValue, data = dataFrame, 
             kind=kind, 
             aspect=aspect,
             palette=palette,
-            order = dataFrame[xLabel1].value_counts().index)
+            order = dataFrame[xValue].value_counts().index)
+        
+    elif (kind == "distplot"):
+        
+        sns.distplot (dataFrame[xValue], 
+                      bins= bins)
+        
+    elif (kind == "cumulative"):
+        
+        sns.distplot (dataFrame[xValue], 
+                      hist_kws = {"cumulative": True},
+                      kde_kws = {"cumulative": True},
+                      bins= bins)
+        
+    elif (kind == "boxplot"):
+    
+        sns.boxplot ( x= xValue, y= yValue, data= dataFrame,
+                     orient= "h")
 
-        if title != "":
-            plt.title(title)
+        
+    if title != "":
+        plt.title(title)
 
-        plt.grid(grid)
+    plt.grid(grid)
 
-        if yLabel1 != "": 
-            plt.ylabel(yLabel1)
+    if xName != "":
+        plt.xlabel(xName)
+        
+    if yName != "": 
+        plt.ylabel(yName)
 
-        plt.show()
+    plt.show()
+
 
 
 
@@ -422,8 +447,12 @@ if (__name__ == "__main__"):
 
     if (teste_histPlot):
 
-        dataFrame = sns.load_dataset("exercise")
-        print (dataFrame)
+        df= pd.read_csv(r"./arquivosTeste/Curso de Estatística/dados.csv")
+        print (df)
+        
+        #histPlot(df, xLabel1= "Frequência", yLabel1="Ocorrencias", title= "Teste Titulo", kind= "count", aspect= 3, palette= "GnBu_d", grid= True)
 
-        histPlot(dataFrame, xLabel1= "time", yLabel1="Ocorrencias", title= "Teste Titulo", kind= "count", aspect= 3, palette= "GnBu_d", grid= True)
+        #histPlot(df, xValue= "Idade", yName="Ocorrencias", title= "Teste Titulo", kind= "cumulative", aspect= 2, palette= "GnBu_d", grid= True)
+        histPlot(df, xValue= "Anos de Estudo", yValue= "Sexo", kind= "boxplot")
+
 

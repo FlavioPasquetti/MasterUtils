@@ -1,3 +1,4 @@
+from locale import normalize
 import pandas as pd
 
 #---------------------------------------------------------------------------------------------
@@ -68,50 +69,78 @@ def ordenarIndex (df):
 #ESTATISTICA PANDAS
 
 def estatisticaPandas (df, key, param0= None, param1= None, param2= None, param3= None):
-    #key = max, min, freq, prob, porc, media, median, descrip, segm
+    #key = max, min, freq, prob, porc, media, median, descrip, segm, moda, quan, desvM, varian, desvP
 
     #-----------------------------------------------------------
-
     #max
     if (key== "max"):
         #param0 = columnName
         #param1 = numero de valores
 
-        return df[param0].nlargest(param1).values
-
+        return df[param0].nlargest(param1)
 
     #-----------------------------------------------------------
-
     #min
+    elif (key== "min"):
+        #param0 = columnName
+        #param1 = numero de valores
+
+        return df[param0].nsmallest(param1)
 
     #-----------------------------------------------------------
-
     #frequencia
-
+    elif (key== "freq"):
+        #param0 = columnName
+        #param1 = numero de valores
+        
+        return df[param0].value_counts().iloc[:param1]
     #-----------------------------------------------------------
-
     #probabilidade
+    elif (key== "prob"):
+        #param0 = columnName
+        #param1 = numero de valores
+        
+        return df[param0].value_counts(normalize= True).iloc[:param1]
 
     #-----------------------------------------------------------
-
     #porcentagem
+    elif (key== "porc"):
+        #param0 = columnName
+        #param1 = numero de valores
+        
+        return df[param0].value_counts(normalize= True).iloc[:param1]*100
 
     #-----------------------------------------------------------
-
     #media
+    elif (key== "media"):
+        #param0 = columnName
+                
+        return df[param0].mean()
 
     #-----------------------------------------------------------
-
     #mediana
+    elif (key== "median"):
+        #param0 = columnName
+                
+        return df[param0].median()
 
     #-----------------------------------------------------------
-
     #descricao
+    elif (key== "descrip"):
+        #param0 = columnName
+                
+        return df[param0].describe()
+    
+    #-----------------------------------------------------------
+    #moda
+    elif (key== "moda"):
+        #param0 = columnName
+                
+        return df[param0].mode()
 
     #-----------------------------------------------------------
-
-    if (key == "segm"):
-        #segment
+    #segment
+    elif (key == "segm"):
         #Segmenta os dados em um conjunto de classes definidas
         #param0 = columnName
         #param1 = classes
@@ -130,8 +159,37 @@ def estatisticaPandas (df, key, param0= None, param1= None, param2= None, param3
 
         return pd.DataFrame({"Frequência" : freq, "Probabilidade" : prob})
 
+    #-----------------------------------------------------------
+    #quantile
+    elif (key== "quan"):
+        #param0 = columnName
+        #param1 = fracao ou lista de fracoes/ se param0 = "default"
+    
+        if param1 == "default":
+            return df[param0].quantile([0.25, 0.5, 0.75])
+                        
+        return df[param0].quantile(q = param1)
+    
+    #-----------------------------------------------------------
+    #Desvio Medio Absoluto
+    elif (key== "desvM"):
+        #param0 = columnName
 
+        return df[param0].mad()
+    
+    #-----------------------------------------------------------
+    #Variancia
+    elif (key== "varian"):
+        #param0 = columnName
 
+        return df[param0].var()
+    
+    #-----------------------------------------------------------
+    #Desvio Padrao
+    elif (key== "desvP"):
+        #param0 = columnName
+
+        return df[param0].std()
 
     
 
@@ -207,6 +265,9 @@ if __name__ == "__main__":
         ordenarIndex(dfResult)
         print (dfResult)
 
+        dfResult= estatisticaPandas(df, "quan", param0= "Renda", param1= "default")
+        print (dfResult)
+
         df= pd.DataFrame( data= {"Fulanin": [8,10,4,8,6,10,8],
                                  "Beltrano": [10, 2, 0.5, 1, 3, 9.5, 10],
                                  "Sicrano": [7.5, 8, 7, 8, 8, 8.5, 7]},
@@ -215,6 +276,9 @@ if __name__ == "__main__":
 
         df.rename_axis("Matérias", axis= "columns", inplace= True)
 
-        dfResult= estatisticaPandas (df, "max", param0= "Fulanin", param1= 2)
-        teste= print (dfResult)
-    
+        dfResult= estatisticaPandas (df, "min", param0= "Fulanin", param1= 2)
+        dfResult= estatisticaPandas (df, "desvP", param0= "Fulanin")
+        print (dfResult)
+        
+        
+        
