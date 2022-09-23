@@ -34,5 +34,5 @@ import EspecialUtils
 import PlotsUtils
 import VarControlsUtils
 import UnidConverterUtils
-import MathUtils
+import OldMathUtils
 import webScraping

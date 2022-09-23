@@ -1,91 +1,358 @@
-from nltk import FreqDist as nltkFreqDist
-import numpy as np
+from locale import normalize
 import pandas as pd
+from scipy.stats import binom, poisson, norm
 
 #---------------------------------------------------------------------------------------------
-#ESTATISTICA LISTA OBJ
+#CONVERSAO PANDAS
 
-def maxTurbo (lista, nreturns= 1, key="escalar", out= "itens"):
+def convertListToPandas (columnsList= [], nomesColunas= []):
+
+    if (len(columnsList) != len(nomesColunas)): 
+        return None
+
+    df= pd.DataFrame (columnsList).transpose()
+    df.columns = nomesColunas
+
+    return df
+
+#---------------------------------------------------------------------------------------------
+#CONVERSAO PANDAS
+
+def convertDictToPandas (dict= {}):
     
-    #key: escalar, frequencia
-    #out: itens, values, all
+    #Conferindo se os valores são uma lista
+    for key, valueDict in dict.items():
+
+        if (type(valueDict) != list):
+            listaValue= [valueDict]
+            dict[key]= listaValue
+
+    df= pd.DataFrame.from_dict(dict)
+
+    return df
+
+#---------------------------------------------------------------------------------------------
+#AJUSTES DATAFRAME PANDAS
+
+def renamePandas (df, axis, names):
+    #axis= 0 = "columns" or 1 = "rows"
     
-    listReturn= [[],[]]
-    
-    if key=="escalar":
-        for ret in range(nreturns):
-            listReturn[0].append(max(lista))
-            listReturn[1].append(max(lista))
-            lista.remove(max(lista))
-    
-    elif key=="frequencia":
-        freqList= nltkFreqDist(lista)
-        results= (freqList.most_common(nreturns))
+    if axis == 0:
+        df.columns = names
+
+    elif axis == 1:
+        df.rows = names
+
+
+def renameIndexAxisPandas (df, axis, names):
+    #axis= 0 = "columns" or 1 = "rows"
+
+    if axis == 0:
+        df.rename_axis (names, axis= "columns", inplace= True)
+
+    elif axis == 1:
+        df.rename (index= names, inplace= True)
+
+
+#---------------------------------------------------------------------------------------------
+#CONVERSAO PANDAS
+def listPandasColumn (df, nameColumn):
+
+    return list(df[nameColumn])
+
+#---------------------------------------------------------------------------------------------
+#AJUSTES PANDAS
+def ordenarIndex (df):
+
+    df.sort_index(ascending= False, inplace= True)
+
+#---------------------------------------------------------------------------------------------
+#ESTATISTICA PANDAS
+
+def estatisticaPandas (df, key, param0= None, param1= None, param2= None):
+    #key = max, min, freq, prob, porc, media, median, descrip, segm, moda, quan, desvM, varian, desvP
+
+    #-----------------------------------------------------------
+    #max
+    if (key== "max"):
+        #param0 = columnName
+        #param1 = numero de valores
+
+        return df[param0].nlargest(param1)
+
+    #-----------------------------------------------------------
+    #min
+    elif (key== "min"):
+        #param0 = columnName
+        #param1 = numero de valores
+
+        return df[param0].nsmallest(param1)
+
+    #-----------------------------------------------------------
+    #frequencia
+    elif (key== "freq"):
+        #param0 = columnName
+        #param1 = numero de valores
         
-        listItens= []
-        listValues= []
-        for item in results:
-            listItens.append(item[0])
-            listValues.append(item[1])
-            
-        listReturn[0]= listItens
-        listReturn[1]= listValues
+        return df[param0].value_counts().iloc[:param1]
+    #-----------------------------------------------------------
+    #probabilidade
+    elif (key== "prob"):
+        #param0 = columnName
+        #param1 = numero de valores
         
-    elif key=="probabilidade":
-        freqList= nltkFreqDist(lista)
-        results= (freqList.most_common(nreturns))
+        return df[param0].value_counts(normalize= True).iloc[:param1]
+
+    #-----------------------------------------------------------
+    #porcentagem
+    elif (key== "porc"):
+        #param0 = columnName
+        #param1 = numero de valores
         
-        listItens= []
-        listValues= []
-        for item in results:
-            listItens.append(item[0])
-            listValues.append(item[1]/len(lista))
-            
-        listReturn[0]= listItens
-        listReturn[1]= listValues
-        
+        return df[param0].value_counts(normalize= True).iloc[:param1]*100
+
+    #-----------------------------------------------------------
+    #media
+    elif (key== "media"):
+        #param0 = columnName
+                
+        return df[param0].mean()
+
+    #-----------------------------------------------------------
+    #mediana
+    elif (key== "median"):
+        #param0 = columnName
+                
+        return df[param0].median()
+
+    #-----------------------------------------------------------
+    #descricao
+    elif (key== "descrip"):
+        #param0 = columnName
+                
+        return df[param0].describe()
     
-    #RETURNS
-    if len(listReturn[0]) == 1:
-        if (out == "itens"):
-            return listReturn[0][0]
-        elif (out == "values"):
-            return listReturn[1][0]
-        else:
-            return listReturn[0][0], listReturn[1][0]
+    #-----------------------------------------------------------
+    #moda
+    elif (key== "moda"):
+        #param0 = columnName
+                
+        return df[param0].mode()
+
+    #-----------------------------------------------------------
+    #segment
+    elif (key == "segm"):
+        #Segmenta os dados em um conjunto de classes definidas
+        #param0 = columnName
+        #param1 = classes
+        #param2 = labels
+
+        freq = pd.value_counts ( pd.cut(x= df[param0],     
+                                bins= param1, 
+                                labels= param2, 
+                                include_lowest= True) )
+
+        prob = pd.value_counts ( pd.cut(x= df[param0],     
+                                bins= param1, 
+                                labels= param2, 
+                                include_lowest= True), 
+                                normalize= True )
+
+        return pd.DataFrame({"Frequência" : freq, "Probabilidade" : prob})
+
+    #-----------------------------------------------------------
+    #quantile
+    elif (key== "quan"):
+        #param0 = columnName
+        #param1 = fracao ou lista de fracoes/ se param0 = "default"
     
+        if param1 == "default":
+            return df[param0].quantile([0.25, 0.5, 0.75])
+                        
+        return df[param0].quantile(q = param1)
+    
+    #-----------------------------------------------------------
+    #Desvio Medio Absoluto
+    elif (key== "desvM"):
+        #param0 = columnName
+
+        return df[param0].mad()
+    
+    #-----------------------------------------------------------
+    #Variancia
+    elif (key== "varian"):
+        #param0 = columnName
+
+        return df[param0].var()
+    
+    #-----------------------------------------------------------
+    #Desvio Padrao
+    elif (key== "desvP"):
+        #param0 = columnName
+
+        return df[param0].std()
+
+#---------------------------------------------------------------------------------------------
+#PROBABILIDADE - Distribuicao Binomial
+
+def Probabilidade_DistribBinomial (k, n, p, cumulativo= False):
+    
+    #p= probabilidade de sucesso evento unico
+    #q= (1-p) = probabilidade de fracasso evento unico
+    #n= numero de eventos estudados
+    #k= numero de eventos desejados que tenham sucesso (pode ser uma lista)
+
+    if (cumulativo):
+        return binom.cdf(k,n,p)
+
     else:
-        if (out == "itens"):
-            return listReturn[0]
-        elif (out == "values"):
-            return listReturn[1]
-        else:
-            return listReturn[0], listReturn[1]
+        return binom.pmf(k,n,p)
 
 #---------------------------------------------------------------------------------------------
-#ARREDONDANDO VALORES
+#PROBABILIDADE - Distribuicao Poisson
 
-def roundT(floatOrInt, precision = 5):
-    return round(float(floatOrInt), precision)
+def Probabilidade_DistribPoisson (k, u):
+
+    #e= constante= 2.718281828459045
+    #u= representa o numero medio de ocorrencias em um determinado intervalo de tempo ou espaco
+    #k= numero de sucessos no intervalo desejado
+
+    return poisson.pmf(k, u)
 
 #---------------------------------------------------------------------------------------------
-#PRINT VALORES 
+#PROBABILIDADE - Distribuicao Normal
 
-def sciStr(floatOrInt, precision = 5, exp_digit = 3, min_digits = 5):
-    return str(np.format_float_scientific(float(floatOrInt), precision=precision, exp_digits=exp_digit, min_digits=min_digits))
+def Probabilidade_DistribNormal (x, o, u, typeP= "cumulative"):
 
-#---------------------------------------------------------------------------------------------
-#Numero de Classes - Regra de Sturges
+    #x= variavel normal
+    #o= desvio padrao
+    #u= media
+    #typeP= cumulative, between, rest
 
-def sturges (nAmostra):
+    if (typeP== "cumulative"):
+        Z= (x - u)/o
 
-    k= 1 + (10/3)*np.log10(nAmostra)
+        return norm.cdf(Z)
 
-    return k
+    elif (typeP== "between"):
+        Zinf= (x[0] - u)/o
+        Zsup= (x[1] - u)/o
 
+        return norm.cdf(Zsup) - norm.cdf(Zinf)
 
+    elif (typeP== "rest"):
+        Z= (x - u)/o
 
+        return 1 - norm.cdf(Z)
+
+#============================================================================================
 
 if __name__ == "__main__":
 
-    pass
+    teste_convertListToPandas= False
+    teste_convertDictToPandas= False
+    teste_listPandasColumn= False
+    teste_renamePandas= False
+    teste_estatisticaPandas= False
+    teste_Distribuicoes= True
+
+    if (teste_convertListToPandas):
+        dadosEmLista= ['laptop', 'printer', 'tablet', 'desk', 'chair']
+        valorEmLista= [1000, 2000, 1500, 5000, 100]
+        
+        df= convertListToPandas([dadosEmLista, valorEmLista], ["Produtos", "Valor"]) 
+
+        print (df)
+
+    #---------------------------------------------------------------------------------------------
+
+    if (teste_convertDictToPandas):
+
+        dadosDict= {'laptop' : [1000], 'printer': [2000], 'tablet': 1500, 'desk': 5000, 'chair': 100}
+
+        df= convertDictToPandas(dadosDict)
+
+        print(df)
+
+    #---------------------------------------------------------------------------------------------
+
+    if (teste_listPandasColumn):
+
+        dadosEmLista= ['laptop', 'printer', 'tablet', 'desk', 'chair']
+        valorEmLista= [1000, 2000, 1500, 5000, 100]
+        
+        df= convertListToPandas([dadosEmLista, valorEmLista], ["Produtos", "Valor"]) 
+
+        listValores= listPandasColumn(df, "Valor")
+
+        print (listValores)
+
+    #---------------------------------------------------------------------------------------------
+
+    if (teste_renamePandas):
+
+        dadosEmLista= ['laptop', 'printer', 'tablet', 'desk', 'chair']
+        valorEmLista= [1000, 2000, 1500, 5000, 100]
+        
+        df= convertListToPandas([dadosEmLista, valorEmLista], ["Produtos", "Valor"]) 
+
+        renamePandas(df, 0, ["teste1", "teste2"])
+
+        renameIndexAxisPandas(df, 0, "teste")
+        renameIndexAxisPandas(df, 1, {0: "valor1", 1: "valor2", 2: "valor3", 3: "valor4", 4: "valor5"})
+
+        print (df)
+
+    #---------------------------------------------------------------------------------------------
+
+    if (teste_estatisticaPandas):
+
+        df= pd.read_csv(r"./arquivosTeste/Curso de Estatística/dados.csv")
+
+        labels= ["E", "D", "C", "B", "A"]
+        classes= [0, 1576, 3152, 7880, 15760, 200000]
+        
+        pd.cut(x= df["Renda"], bins= classes, labels= labels, include_lowest= True)
+
+        dfResult= estatisticaPandas (df, "segm", param0= "Renda", param1= classes, param2= labels)
+        ordenarIndex(dfResult)
+        print (dfResult)
+
+        dfResult= estatisticaPandas(df, "quan", param0= "Renda", param1= "default")
+        print (dfResult)
+
+        df= pd.DataFrame( data= {"Fulanin": [8,10,4,8,6,10,8],
+                                 "Beltrano": [10, 2, 0.5, 1, 3, 9.5, 10],
+                                 "Sicrano": [7.5, 8, 7, 8, 8, 8.5, 7]},
+                          index= ["Matemática", "Portugues", "Ingles", "Geografia",
+                                  "Historia", "Fisica", "Quimica"])
+
+        df.rename_axis("Matérias", axis= "columns", inplace= True)
+
+        dfResult= estatisticaPandas (df, "min", param0= "Fulanin", param1= 2)
+        dfResult= estatisticaPandas (df, "desvP", param0= "Fulanin")
+        print (dfResult)
+
+    #---------------------------------------------------------------------------------------------
+    if (teste_Distribuicoes):
+
+        k= [5,8]
+        n= 10
+        p= 1/4
+
+        result= Probabilidade_DistribBinomial (k, n, p)
+        print (result)
+
+        u= 20
+        k= 15
+
+        result= Probabilidade_DistribPoisson (k, u)
+        print (result)
+        
+        x= 1.8
+        u= 1.7
+        o= 0.1
+
+        result= Probabilidade_DistribNormal(x, o, u)
+        print (result)
+        
