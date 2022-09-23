@@ -245,7 +245,38 @@ def Probabilidade_DistribNormal (x, o, u, typeP= "cumulative"):
 
         return 1 - norm.cdf(Z)
 
+#---------------------------------------------------------------------------------------------
+#PROBABILIDADE - Intervalo de Confianca
+
+def intervaloConfianca(significancia, media_amostral, sigma):
+
+    #sigma= desvio padrao/ raiz(quantidade Amostra)
+    
+    return norm.interval (alpha= significancia, loc= media_amostral, scale= sigma)
+
+#---------------------------------------------------------------------------------------------
+#PROBABILIDADE - Quantidade Amostra
+
+def tamanhoAmostra (z, e, o):
+
+    #z= variavel normal padronizada - ex: caso queira 95% de confianca Z= norm.ppf(0.5 + (0.95/2))
+    #o= desvio padrao populacional ou amostral (s) caso seja desconhecido o desvio padrao
+    #e= erro inferencial - valor que pode ser variada a variavel normal ex: R$3000 +- 100.. o 100 seria o erro inferencial
+
+    return (z*(o/e))**2
+
+def tamanhoAmostra (N, z, o, e):
+
+    #N= Tamanho da populacao
+    #z= variavel normal padronizada - ex: caso queira 95% de confianca Z= norm.ppf(0.5 + (0.95/2))
+    #o= desvio padrao populacional ou amostral (s) caso seja desconhecido o desvio padrao
+    #e= erro inferencial - valor que pode ser variada a variavel normal ex: R$3000 +- 100.. o 100 seria o erro inferencial
+
+    return ((z**2)*(o**2)*N) / ( ((z**2)*(o**2)) + (e**2)*(N-1) )
+
 #============================================================================================
+
+
 
 if __name__ == "__main__":
 
@@ -254,7 +285,8 @@ if __name__ == "__main__":
     teste_listPandasColumn= False
     teste_renamePandas= False
     teste_estatisticaPandas= False
-    teste_Distribuicoes= True
+    teste_Distribuicoes= False
+    teste_TeoremaLimiteCentral= True
 
     if (teste_convertListToPandas):
         dadosEmLista= ['laptop', 'printer', 'tablet', 'desk', 'chair']
@@ -356,3 +388,11 @@ if __name__ == "__main__":
         result= Probabilidade_DistribNormal(x, o, u)
         print (result)
         
+    #---------------------------------------------------------------------------------------------
+    if (teste_TeoremaLimiteCentral):
+
+        n= 2000
+        totalAmostra= 1500
+
+
+
