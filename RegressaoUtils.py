@@ -17,3 +17,8 @@ if __name__ == "__main__":
 
     print (matrizCorrelacao(dados))
     
+    import PlotsUtils as pu
+    
+    print (dados["consumo"])
+    #pu.dfPlot(dados, xValue="consumo", kind= "distplot", xName= "Teste", title= "titutlo teste", bins= 10, size_inches=[12,6], grid= True)
+    pu.dfPlot(dados, xValue="temp_max", yValue="consumo", kind= "jointplot", xName= "Teste", title= "titutlo teste", bins= 10, size_inches=[12,6], grid= True)
