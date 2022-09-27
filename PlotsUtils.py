@@ -422,6 +422,10 @@ def dfPlot (dataFrame, xValue, yValue= None, zValue= None, xName= "", yName= "",
     elif (kind == "lmplot"):
         
         graph= sns.lmplot (x= xValue, y= yValue, data= dataFrame, col= zValue)
+
+    elif (kind == "scatterplot"):
+
+        graph= sns.scatterplot(x= xValue, y= yValue)
         
     if size_inches != None:
         graph.figure.set_size_inches(size_inches[0], size_inches[1])
