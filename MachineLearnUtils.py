@@ -1,6 +1,7 @@
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn import metrics
+import pickle
 import pandas as pd
 import numpy as np
 
@@ -17,10 +18,15 @@ def regressaoLinear (dataFrame, yValue, xValues, test_size= 0.5, plotGraph= Fals
 
     modelo= LinearRegression()
     modelo.fit(X_train, y_train)
-    print ("R² Treino = {}".format(modelo.score(X_train, y_train).round(2)))
 
     y_previsto= modelo.predict(X_test)
-    print ("R² Testes = %s" % metrics.r2_score(y_test, y_previsto).round(2))
+
+    R2 = metrics.r2_score(y_test, y_previsto).round(2)
+    EQM = metrics.mean_squared_error(y_test, y_previsto).round(2)
+    REQM = np.sqrt(metrics.mean_squared_error(y_test, y_previsto)).round(2)
+
+    metricas= pd.DataFrame([EQM, REQM, R2], ["EQM", "REQM", "R2"], columns= ["Metricas"])
+    print (metricas)
 
     coeficientes= pd.DataFrame(data= np.append(modelo.intercept_, modelo.coef_), index= ["Intercepto"] + xValues, columns= ["Parametros"])
     print (coeficientes) 
@@ -39,7 +45,23 @@ def regressaoLinear (dataFrame, yValue, xValues, test_size= 0.5, plotGraph= Fals
 def predictValues (modelo, dataFramePredict):
 
     return modelo.predict(dataFramePredict)
+
+#-----------------------------------------------------------------------------------------------------------------------------
+def saveModelo (modelo, path):
     
+    output= open(path, "wb")
+    pickle.dump(modelo, output)
+    output.close()
+
+#-----------------------------------------------------------------------------------------------------------------------------
+def loadModelo (path):
+    
+    input= open(path, "rb")
+    modelo= pickle.load(input)
+    input.close()
+
+    return modelo
+
 #=============================================================================================================================
 if __name__ == "__main__":
 
@@ -56,6 +78,10 @@ if __name__ == "__main__":
         dataPredict= mu.convertListToPandas (columnsList= [[30.5, 40.1], [12.2, 0.5], [0, 1]], nomesColunas= ["temp_max", "chuva", "fds"])
         print (dataPredict)
         print (modeloRegres.predict(dataPredict))
+
+        saveModelo(modeloRegres, r"./arquivosTeste/Consumo_cerveja")
+        modelo = loadModelo(r"./arquivosTeste/Consumo_cerveja")
+        print (modelo.predict(dataPredict))
 
 
 
