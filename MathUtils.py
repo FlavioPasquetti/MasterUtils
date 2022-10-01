@@ -1,5 +1,5 @@
-from locale import normalize
 import pandas as pd
+import numpy as np
 from scipy.stats import binom, poisson, norm
 
 #---------------------------------------------------------------------------------------------
@@ -274,6 +274,20 @@ def tamanhoAmostra (N, z, o, e):
 
     return ((z**2)*(o**2)*N) / ( ((z**2)*(o**2)) + (e**2)*(N-1) )
 
+#---------------------------------------------------------------------------------------------
+#CALCULOS - log
+
+def dfLog (df, xValue= "all"):
+
+    #Verificar se o conjunto de dados apresenta zeros (0.0) caso apresente, somar 1.0 a todos os valores do conjunto, pra evitar erro no calculo de log(0)
+    
+    if xValue == "all":
+        return np.log(df)
+
+    else:
+        return np.log(df[xValue])
+
+
 #============================================================================================
 
 
@@ -286,7 +300,7 @@ if __name__ == "__main__":
     teste_renamePandas= False
     teste_estatisticaPandas= False
     teste_Distribuicoes= False
-    teste_TeoremaLimiteCentral= True
+    teste_TeoremaLimiteCentral= False
 
     if (teste_convertListToPandas):
         dadosEmLista= ['laptop', 'printer', 'tablet', 'desk', 'chair']
