@@ -2,6 +2,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn import metrics
 import statsmodels.api as sm
+import statsmodels.formula.api as smf
 import pickle
 import pandas as pd
 import numpy as np
@@ -67,6 +68,23 @@ def regressionLinearWithLog (dataFrame, yValue, xValues, test_size= 0.5, plotGra
         
         residuoQuadrado = (y_train - y_previsto_train)**2
         pu.dfPlot (dataFrame, y_previsto_train, yValue= residuoQuadrado, xName= "Previsto", yName= "Residual", title= "(Modelo Regressão Linear) Residuos X Previsão", kind= "scatterplot", size_inches=(8,6))
+
+    return modelo
+
+#-----------------------------------------------------------------------------------------------------------------------------
+def equationModel (dataFrame, formula):
+    #ex: formula: Porcoes ~ Farinha + Chocolate + Farinha:Chocolate"
+    # O exemplo acima seria a seguinte formula -> Y = p1*Farinha + p2*Chocolate + p3*Farinha*Chocolate + intercepto + erro
+    # ~ representa igual (=) em uma formula
+    # : representa um parametro conjunto entre duas variaveis
+    #Necessariamente o nome nas formulas deve ser nome de coluna do dataframe
+
+    modelo = smf.ols(data= dataFrame, formula= formula).fit()
+
+    # P > |t| para a variavel deve ser menor que 0.05 para ser uma variavel significativa na regressão.. se for maior que esse valor pode ser retirada.
+    print (modelo.summary())
+
+    print (modelo.params)
 
     return modelo
 

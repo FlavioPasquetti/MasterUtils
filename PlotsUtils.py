@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns   
 import scipy
+import matplotlib.cm as cm
 
 
 #---------------------------------------------------------------------------------------------
@@ -401,7 +402,7 @@ def dfPlot (dataFrame, xValue, yValue= None, zValue= None, xName= "", yName= "",
         
     elif (kind == "distplot"):
         
-        graph= sns.distplot (dataFrame[xValue], bins= bins)
+        graph= sns.distplot (dataFrame[xValue], bins= bins, kde= False)
         
     elif (kind == "cumulative"):
         
@@ -426,7 +427,17 @@ def dfPlot (dataFrame, xValue, yValue= None, zValue= None, xName= "", yName= "",
     elif (kind == "scatterplot"):
 
         graph= sns.scatterplot(x= xValue, y= yValue)
+
+    elif (kind == "imshow"):
+        #xValue deve ser o intervalo do eixo X - ex: [1.0, 2.0]
+        #yValue deve ser o intervalo do eixo Y - ex: [0.1, 0.5]
+        graph= plt.imshow(list(dataFrame.values), origin= "lower", cmap= cm.rainbow, interpolation= "quadric", extent= (xValue[0], xValue[1], yValue[0], yValue[1]))
         
+    elif (kind == "relev"):
+        #zValue deve ter a dimensao X x Y .. pois define o valor da altura para cada ponto 
+        graph = plt.contour(df[xValue].values, df[yValue].values, list(df[zValue].values), colors= "k", linewidth= 1.5)
+        plt.clabel (graph, inline= True, fontsize= 15.0, inline_spacing = 10)
+
     if size_inches != None:
         graph.figure.set_size_inches(size_inches[0], size_inches[1])
 
