@@ -95,6 +95,8 @@ def listFilesandFolders (pathDir, recurs = False):
         if os.path.isfile(path):
             files.append(path)
 
+            print (path)
+
         if os.path.isdir(path):
             folders.append(path)
 
@@ -266,3 +268,8 @@ def messageBox (title, message, icon = 0x10, buttons = 0, styleWindow = 0x2000):
 
     return ctypes.windll.user32.MessageBoxW(None, message, title, icon | buttons | styleWindow)
 
+
+
+if __name__ == "__main__":
+
+    listFilesandFolders(r"D:\BV\1-ANDAMENTO\3871-P31\P&IDs P31")

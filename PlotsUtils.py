@@ -444,9 +444,6 @@ def dfPlot (dataFrame, xValue, yValue= None, zValue= None, xName= "", yName= "",
     plt.show()
 
 
-
-
-
 if (__name__ == "__main__"):    
 
     teste_graficPlot = False
