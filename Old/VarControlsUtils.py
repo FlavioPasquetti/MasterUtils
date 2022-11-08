@@ -23,7 +23,7 @@ def remove_repetidos(lista):
 
 def removeEspecialCaracters(inText):
 
-    outText = inText.replace("|","").replace("/","").replace("\\","").replace("*","").\
+    outText =  inText.replace("|","").replace("/","").replace("\\","").replace("*","").\
               replace("$","").replace("^","").replace('"',"").replace("'","").replace(";","").\
               replace(" ","").replace("-","").replace(".","").replace(",","").replace("ç","").\
               replace("(","").replace(")","").replace("ã","").replace("á","")

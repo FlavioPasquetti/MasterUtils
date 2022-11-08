@@ -5,6 +5,7 @@ from sklearn import metrics
 from sklearn.svm import LinearSVC, SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import export_graphviz
+from sklearn.neighbors import KNeighborsClassifier
 import graphviz #Necessario instalar no windows -> https://graphviz.org/download/
 
 
