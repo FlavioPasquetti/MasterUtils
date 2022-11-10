@@ -2,7 +2,8 @@ import ctypes
 import threading
 import time
 import tkinter as tk
-from tkinter import ttk as ttk
+from tkinter import *
+from tkinter import ttk
 
 #---------------------------------------------------------------------------------------------
 
@@ -240,3 +241,85 @@ class ProgressBar( tk.Toplevel ):
     def is_active(self):
 
         return self.winfo_exists()
+    
+    
+class progressBarWithChecks():
+    
+    def __init__(self, listChecks, title, total= 100):
+        
+        self.root= None
+        self.listChecks= listChecks
+        self.title= title
+        self.style= None
+        
+        self.value= 0
+        self.total = total
+        
+        self.progressBarHeight= 25 
+        self.checksHeight= 30
+        self.totalHeight= self.checksHeight*(len(self.listChecks) + 1) + self.progressBarHeight + 10
+        
+        self.checkVars= {}
+        self.progressBarVar= None    
+        self.progressBar= None
+               
+        self.interface()
+        self.styleProgressbar()
+        
+    def interface(self):
+        
+        self.root= Tk()
+        self.root.title(self.title)
+        self.root.geometry("250x" + str(self.totalHeight))
+        self.root.resizable(width= False, height= False)
+        
+        self.progressBarVar= tk.DoubleVar() 
+        self.progressBar= ttk.Progressbar(self.root, length= 200, variable= self.progressBarVar)
+        self.progressBar.place(x=25, y= 20, height= self.progressBarHeight)
+        self.progressBar['maximum']= self.total
+
+        for checkItem in self.listChecks:
+            
+            self.checkVars[checkItem]= tk.BooleanVar()
+            
+            cb= Checkbutton(self.root, text=checkItem, variable=self.checkVars[checkItem], state= DISABLED)
+            cb.place(x=25, y= self.listChecks.index(checkItem)*self.checksHeight + 50, width= 200, height=30)
+            
+    def show(self):
+        
+        threading.Thread(target=self.root.mainloop).start()
+        
+    def setValue(self, value):
+        
+        self.value= value
+        self.progressBarVar.set(self.value)
+        self.style.configure('text.Horizontal.TProgressbar', text=f'{self.value} / {self.total}')
+        self.root.update()
+                
+    def setIcon (self, pathImage):
+        
+        self.root.iconphoto(False, PhotoImage(file = pathImage))
+        
+    def styleProgressbar(self):
+        
+        self.style= ttk.Style(self.root)
+        
+        self.style.layout('text.Horizontal.TProgressbar',
+                           [('Horizontal.Progressbar.trough',
+                             { 'children' :  [('Horizontal.Progressbar.pbar',
+                                              { 'side'   : 'left', 
+                                                'sticky' : 'ns' })],
+                              'sticky'    : 'nswe' }),
+                            ('Horizontal.Progressbar.label', 
+                             { 'sticky' : '' })
+                           ])
+        
+        self.style.configure('text.Horizontal.TProgressbar', text=f'0 / {self.total}')
+        
+        self.progressBar['style']= 'text.Horizontal.TProgressbar'
+        self.root.update()
+        
+    def checkItem(self, item):
+        
+        self.checkVars[item].set(True)
+        
